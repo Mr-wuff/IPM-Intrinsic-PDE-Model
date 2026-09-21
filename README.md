@@ -132,7 +132,7 @@ Formal experiments follow a preregistered protocol:
 | Stage | Purpose | Status |
 |---|---|---|
 | **IPM-M0** | Qualify intrinsic prolongation as an architectural mechanism | Completed — structural identity validated; empirical qualification failed, redesign in progress |
-| **IPM-M1** | Repair high-order state closure, conditioning, and rollout stability | Planned |
+| **IPM-M1** | Repair high-order state closure, conditioning, and rollout stability | Formal script released — experiment pending |
 | **IPM-A0** | Formal 1-D multi-PDE benchmark | Blocked until M-stage qualification |
 | **IPM-A1** | Time/grid/parameter/IC generalization | Planned |
 | **IPM-A2** | 2-D PDE and mixed-derivative consistency | Planned |
@@ -387,7 +387,7 @@ IPM 是否能够由此获得更好的稳定性、泛化性、物理一致性和�
 | 阶段 | 目标 | 状态 |
 |---|---|---|
 | **IPM-M0** | 验证 Intrinsic Prolongation 是否具备成为核心架构机制的资格 | 已完成——结构恒等性成立，但经验性能资格验证失败，正在重新设计 |
-| **IPM-M1** | 解决高阶状态闭合、条件数与 rollout 稳定性问题 | 计划中 |
+| **IPM-M1** | 解决高阶状态闭合、条件数与 rollout 稳定性问题 | 正式脚本已发布——等待实验结果 |
 | **IPM-A0** | 正式一维多 PDE Benchmark | 等待 M 阶段通过 |
 | **IPM-A1** | 时间步/网格/参数/初值泛化实验 | 计划中 |
 | **IPM-A2** | 二维 PDE 与混合偏导一致性 | 计划中 |
