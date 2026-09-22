@@ -4,7 +4,7 @@ Notebook:
 `IPM_M2_Cartan_Lifted_Evolutionary_Field_Qualification_RTX5080_WSL_Colab.ipynb`
 
 Notebook SHA256:
-`61ecdbbabe93786817d092484256e50b94a777bc97c8b763df697cdd83657594`
+`3d3f5dd2cad5e92b0624cb557aa6e404a8952e93bcd62d43fee809b6a363da33`
 
 Frozen protocol SHA256:
 `a9313a69dcda9ee94e03fa68ba211068994546fe7547bc1bef858a00afcf6b08`
