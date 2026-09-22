@@ -69,9 +69,16 @@ The library intentionally contains irrelevant terms so support recovery is nontr
 
 ## Data
 
-Regenerate the exact A0 trajectory family using the frozen A0 seeds/configuration.
+Use the frozen A0 domain, IC generator, temporal sampling, PDE definitions and formal seeds, but equation-discovery cases use **fixed coefficients per PDE** at the center of the A0 training range.
 
-For each formal seed and PDE, use the A0 train trajectories for equation identification and held-out A0 test trajectories for evaluation.
+This is necessary because classical PDE-FIND/SINDy identifies one governing equation at a time, whereas the A0 IPM checkpoint receives PDE parameters as inputs and was trained across coefficient ranges.
+
+For each formal seed and PDE:
+- generate six fixed-coefficient identification trajectories;
+- generate four independent fixed-coefficient test trajectories;
+- use the same underlying trajectories for PySINDy strong/weak baselines and IPM evaluation.
+
+This information-contract difference is reported explicitly rather than hidden.
 
 Observation conditions:
 - clean dense;
