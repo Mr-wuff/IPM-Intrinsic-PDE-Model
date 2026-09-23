@@ -5,6 +5,32 @@
 
 ---
 
+## Current frozen status — 2026-09-23
+
+**IPM-v1 is frozen.** The mathematical core is the Q3-FIX2 principal normal form compiled from the learned differential law, and the deployment runtime is the Q4 CUDA-Graph engine.
+
+- Frozen public PDEBench programs: Advection beta=1 (`T`) and Burgers nu=0.01 (`T+D+S`).
+- Historical IDTC discovery core: **35 trainable scalars**.
+- Effective compiled program size: **36 scalars** for Advection and **38 scalars** for Burgers.
+- Q4 end-to-end single-step speedup vs same-process official NeuralOperator FNO: about **48.8x / 17.5x** at batch 1 and **45.2x / 17.7x** at batch 16.
+- The architecture-modification phase is closed; the repository is now in the comprehensive benchmark phase.
+
+### Install the frozen reusable core
+
+```bash
+pip install "git+https://github.com/Mr-wuff/IPM-Intrinsic-PDE-Model.git@main"
+```
+
+```python
+from ipm_v1 import load_program, IPMStep, HorizonCUDAGraph
+```
+
+The exact frozen program coefficients are versioned in the repository. **Future benchmark notebooks must import the repository package instead of requiring users to re-upload historical Q0/Q3-FIX2/Q4 result ZIP files.**
+
+See `docs/IPM_V1_CODE_QUICKSTART.md`.
+
+> Note: the first B0 classical-solver harness formally passed, but a post-run audit found a batch-index bug in the constant-velocity semi-Lagrangian baseline. That row is not paper-final; B0-FIX1 is preregistered and uses the corrected repository implementation.
+
 ## English
 
 ### Overview
