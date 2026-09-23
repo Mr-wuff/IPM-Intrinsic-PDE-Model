@@ -84,6 +84,12 @@ u_{t+Delta t}(x)
 
 No future state is supplied as an input.
 
+All six neural baselines use the same external residual one-step wrapper
+\[
+\hat u_{t+\Delta t}=u_t+\Delta_\theta(u_t),
+\]
+so Q0 tests the architecture's ability to learn the physical increment rather than spending the short qualification budget relearning the identity map. The wrapper is identical across methods and its addition is included in latency measurements.
+
 Formal public first-10% test trajectories are used only for a final one-step smoke evaluation after the optimizer protocol is frozen.
 
 ## Models
