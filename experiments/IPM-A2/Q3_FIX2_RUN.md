@@ -4,7 +4,7 @@ Notebook:
 `IPM_A2_Q3_FIX2_Principal_Normal_Form_Calibration_Compiler_RTX5080_WSL_Colab.ipynb`
 
 Notebook SHA256:
-`61ff9a11670b2028102c524b29e134d1b5c6d1432b51b0654a189838940ea0db`
+`f5ae0db11fdbeed0e8c9fe7ffeb5c038b7d577cb4f134e01630f3fd20c8b746d`
 
 Protocol SHA256:
 `22381bf60de083cc332790da6675cf74b838f51fc2bfed4a7e5430601c3d8dea`
@@ -19,3 +19,5 @@ Static Python syntax validation: PASS.
 No neural retraining. Frozen Q2 IDTC checkpoints are compiled into a nuisance-free principal normal form with at most four calibration gains using disjoint PDEBench training-pool blocks.
 
 Headline deployment metric: current-hardware end-to-end physical-step latency against the frozen official NeuralOperator FNO reconstructed from Q0.
+
+Deployment implementation audit: static grid/Fourier geometry is cached; frozen polynomial coefficients are evaluated as Python constants; constant diffusion/dispersion roles use a fast path. These changes are mathematically equivalent and do not alter the frozen protocol.
