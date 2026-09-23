@@ -130,7 +130,7 @@ u k^2+gamma(ik)^3)Delta t]hat u_k.
 (R(u)) is advanced by a local Heun step.
 
 ### Retained nuisance terms
-If calibration keeps nuisance terms, evaluate them from the local Taylor jet and apply a bounded/tamed explicit correction. Their contribution and latency are reported separately.
+If calibration keeps nuisance terms, evaluate them from the local Taylor jet and apply a bounded/tamed explicit correction. For a raw increment \(\delta=\Delta t\,N\), use per-sample state RMS \(s_u\) and\n\[\n\delta_{tamed}=\frac{\delta}{1+|\delta|/(0.1s_u+\epsilon)}.\n\]\nThe fixed tame fraction is 0.10. Their contribution and latency are reported separately.
 
 ## Why this is still PDE-native rather than a hand-written Burgers solver
 
