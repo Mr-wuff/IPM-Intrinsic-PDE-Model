@@ -4,7 +4,7 @@ Notebook:
 `IPM_B1_Q1_ThreeSeed_MatchedUpdate_Neural_Benchmark_RTX5080_WSL_Colab.ipynb`
 
 Notebook SHA256:
-`59397ed2d4c3e00e0d321bcd3f363aa3238e96671357e2db9c608de68a28912e`
+`34a51844b1ed82fafc45e0661377e793a2916dc4d7c350d2f129e61089870ce1`
 
 Protocol SHA256:
 `88fc0925420d7c623f16cae072fba69ac98bc5f3d506187db2fef7e46e09673f`
@@ -35,3 +35,5 @@ Formal workload:
 - accuracy / spectral / cost / Pareto exports
 
 The notebook itself is distributed as the run artifact associated with this record; the repository contains the reusable implementation and frozen protocol.
+
+Formal-run hygiene: the notebook removes any pre-existing `IPM_B1_Q1_RESULTS/` directory at startup before creating the new result tree, preventing stale partial-run artifacts from entering the packaged ZIP.
