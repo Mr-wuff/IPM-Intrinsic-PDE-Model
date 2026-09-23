@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ipm-native"
+version = "1.0.0"
+description = "Frozen IPM-v1 PDE-native architecture, compiled programs, and CUDA runtime"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "torch>=2.1"]
+
+[tool.setuptools]
+packages = ["ipm_v1"]
+
+[tool.setuptools.package-data]
+ipm_v1 = ["programs.json", "freeze_manifest.json"]
