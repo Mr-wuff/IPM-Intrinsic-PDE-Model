@@ -1,0 +1,22 @@
+{
+  "name": "IPM-v1",
+  "paper_title": "Make PDE integrated into model native",
+  "mathematical_core": "Q3-FIX2 principal normal form",
+  "runtime": "Q4 E4 single-step CUDA Graph / E5 horizon CUDA Graph",
+  "historical_idtc_trainable_scalars": 35,
+  "programs": {
+    "advection_beta1": {"mask": "T", "effective_scalars": 36, "formal_40step_rel_l2": 0.07976008454958593},
+    "burgers_nu001": {"mask": "TDS", "effective_scalars": 38, "formal_40step_rel_l2": 0.19279542068640387}
+  },
+  "frozen_result_sha256": {
+    "Q0": "6671e747ceda73ce8b27208bf8a367c8f4aec1db1cab4c2a4f54f8081ea1fbf0",
+    "Q3_FIX2": "f55c97725c51e82cbe76c981eaa66337b65cb9df98951d0b2566fc6b9a76cedc",
+    "Q4": "e9073c703c72c2d44896bf437d6db02a1a00815c14771161de072fa5e83d729e",
+    "B0_initial": "0894771ed6600029ef2771f81076f0046acd51a5ec37c9a7eb96fec8228d2566"
+  },
+  "known_limitations": [
+    "Advection N/4 coarse-grid transfer remained above the Q3-FIX2 preregistered degradation gate.",
+    "The initial B0 harness contains a batch-index bug in the constant-velocity SemiLagrangian baseline; B0-FIX1 is required before paper-level use of that row."
+  ],
+  "no_parent_zip_required": true
+}
