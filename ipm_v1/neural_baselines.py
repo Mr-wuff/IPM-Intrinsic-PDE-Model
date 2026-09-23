@@ -151,3 +151,23 @@ def build_b1q0_suite(n_grid=256):
         "UNO_official":make_uno_1d(hidden_channels=32),
         "DeepONet_official":make_deeponet_1d(n_grid=n_grid,latent=64,width=64),
     }
+
+
+def sanitize_state_dict_for_strict_load(state_dict):
+    """Remove non-parameter serialization metadata keys before strict reload.
+
+    NeuralOperator state dictionaries may contain a top-level "_metadata"
+    entry after torch.save/torch.load. That entry is not a module parameter
+    and causes strict load_state_dict() to reject an otherwise valid checkpoint.
+    """
+    cleaned=state_dict.__class__()
+    for key,value in state_dict.items():
+        if key=="_metadata" or key.endswith("._metadata"):
+            continue
+        cleaned[key]=value
+    if hasattr(state_dict,"_metadata"):
+        try:
+            cleaned._metadata=getattr(state_dict,"_metadata")
+        except Exception:
+            pass
+    return cleaned
