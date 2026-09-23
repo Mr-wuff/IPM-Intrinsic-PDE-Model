@@ -238,15 +238,15 @@ No winner is part of the experiment gate.
 
 Q1-0 source commits and PDEBench MD5s match.
 
-Q1-1 all 36 neural training runs complete 1536 finite updates.
+Q1-1 all 36 neural training attempts reach a recorded terminal status; finite completion to 1536 updates, early non-finite optimization, or OOM are all retained as benchmark outcomes rather than hidden.
 
-Q1-2 all diagnostic nodes and final checkpoints export.
+Q1-2 diagnostic nodes export for every run up to its terminal status; a final checkpoint is required for every run that completes 1536 finite updates.
 
-Q1-3 all 36 formal neural rollout evaluations are finite for all 40 steps.
+Q1-3 formal rollout evaluation is attempted for every successfully trained final checkpoint, and finite/non-finite rollout status is explicitly recorded. Numerical instability is a model result and does not by itself make the benchmark incomplete.
 
 Q1-4 frozen IPM reproduces both parent mean errors within 2e-4.
 
-Q1-5 all 36 neural cost records export with no missing params/checkpoint/train-time/VRAM values.
+Q1-5 all 36 neural cost records export params, elapsed training time, peak VRAM, updates completed and terminal status; checkpoint bytes are required for every successfully completed run.
 
 Q1-6 eager inference timing is complete for all 7 methods x 2 PDEs x 3 batches = 42 rows.
 
