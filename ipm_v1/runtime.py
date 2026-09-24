@@ -15,6 +15,7 @@ class IPMStep(nn.Module):
         self.dx=self.length/self.n
         for role in ("R","T","D","S"):
             self.register_buffer(f"c_{role}",torch.tensor(program.coefficients[role],dtype=torch.float32))
+            self.register_buffer(f"g_{role}",torch.tensor(float(program.gains[role]),dtype=torch.float32))
         self.register_buffer("grid",torch.arange(self.n,dtype=torch.float32)[None,None,:])
         k=2*math.pi*torch.fft.rfftfreq(self.n,d=self.dx)
         self.register_buffer("k",k.float())
@@ -26,12 +27,13 @@ class IPMStep(nn.Module):
     def reaction(self,u,h):
         if "R" not in self.mask: return u
         c=self.c_R.to(u.dtype)
-        k1=self.horner(u,c); k2=self.horner(u+h*k1,c)
+        g=self.g_R.to(u.dtype)
+        k1=g*self.horner(u,c); k2=g*self.horner(u+h*k1,c)
         return u+0.5*h*(k1+k2)
 
     def transport(self,u):
         if "T" not in self.mask: return u
-        velocity=-self.horner(u,self.c_T.to(u.dtype))
+        velocity=-self.g_T.to(u.dtype)*self.horner(u,self.c_T.to(u.dtype))
         pos=self.grid.to(u.dtype)-velocity*(self.dt/self.dx)
         j0=torch.floor(pos).long()
         frac=pos-j0.to(pos.dtype)
@@ -46,12 +48,12 @@ class IPMStep(nn.Module):
         use_s="S" in self.mask
         if use_d or use_s:
             if use_d:
-                f2=self.horner(x,self.c_D.to(x.dtype))
+                f2=self.g_D.to(x.dtype)*self.horner(x,self.c_D.to(x.dtype))
                 nu=torch.median(torch.clamp(f2/2.0,min=0.0),dim=-1,keepdim=True).values
             else:
                 nu=torch.zeros(x.shape[0],1,1,device=x.device,dtype=x.dtype)
             if use_s:
-                f3=self.horner(x,self.c_S.to(x.dtype))
+                f3=self.g_S.to(x.dtype)*self.horner(x,self.c_S.to(x.dtype))
                 gamma=torch.median(f3/6.0,dim=-1,keepdim=True).values
             else:
                 gamma=torch.zeros(x.shape[0],1,1,device=x.device,dtype=x.dtype)
