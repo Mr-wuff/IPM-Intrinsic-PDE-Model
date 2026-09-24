@@ -19,3 +19,29 @@ def test_constant_sl_batch_fix():
     u=torch.randn(7,1,64)
     y=m(u)
     assert y.shape==u.shape
+
+
+def test_spectral_multiplier_runtime_equivalence_cpu():
+    # The v1.0.1 runtime avoids torch.exp(complex) but must remain
+    # numerically equivalent to the frozen v1.0.0 spectral formula.
+    import math
+    torch.manual_seed(7)
+    n=256
+    x=torch.randn(4,1,n,dtype=torch.float64)
+    U=torch.fft.rfft(x,dim=-1)
+    k=2*math.pi*torch.fft.rfftfreq(n,d=1.0/n,dtype=torch.float64)
+    nu=torch.rand(4,1,1,dtype=torch.float64)*0.03
+    gamma=(torch.rand(4,1,1,dtype=torch.float64)-0.5)*0.02
+    dt=0.005
+
+    symbol=-nu*k[None,None,:].square()+gamma*((1j*k).to(U.dtype)**3)[None,None,:]
+    old=torch.exp(dt*symbol)
+
+    kk=k[None,None,:]
+    decay=torch.exp(-dt*nu*kk.square())
+    phi=dt*gamma*kk.pow(3)
+    new=torch.complex(decay*torch.cos(phi),-decay*torch.sin(phi)).to(U.dtype)
+
+    rel=((old-new).abs().pow(2).mean().sqrt()/
+         old.abs().pow(2).mean().sqrt().clamp_min(1e-30))
+    assert float(rel)<1e-12
