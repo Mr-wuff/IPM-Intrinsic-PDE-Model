@@ -138,7 +138,7 @@ A new 500-epoch standard-data run is authorized only if one predeclared variant 
 - compiled/full characteristic discrepancy <=0.05 on both PDEs;
 - no role/component produces non-finite rollout.
 
-If no variant passes, do not launch another 500-epoch run. The next stage must investigate objective conditioning / optimizer design.
+Eligible formal candidates are predeclared as `T1_S124_NATIVE` and `T1_S111_NATIVE_LOCAL`. If both pass, select the candidate with the lower geometric mean of the two task-level common 8-step validation Rel-L2 values. If neither passes, do not launch another 500-epoch run. The next stage must investigate objective conditioning / optimizer design.
 
 ## Fairness interpretation
 
