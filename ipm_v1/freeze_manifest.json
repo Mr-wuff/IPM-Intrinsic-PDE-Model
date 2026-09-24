@@ -21,11 +21,15 @@
     "Q3_FIX2": "f55c97725c51e82cbe76c981eaa66337b65cb9df98951d0b2566fc6b9a76cedc",
     "Q4": "e9073c703c72c2d44896bf437d6db02a1a00815c14771161de072fa5e83d729e",
     "B0_initial": "0894771ed6600029ef2771f81076f0046acd51a5ec37c9a7eb96fec8228d2566",
-    "B0_FIX1": "dbeb2df1487718d51dd2f5180a440fa2f693b53f9c1e298281f3c0bb2c56918c"
+    "B0_FIX1": "dbeb2df1487718d51dd2f5180a440fa2f693b53f9c1e298281f3c0bb2c56918c",
+    "PDEBENCH_PB0": "4a2d77f9d954d9ff01a70f0b744f4df455a15efb7a9ba74febeca216c5a8b831"
   },
   "known_limitations": [
     "Advection N/4 coarse-grid transfer remained above the Q3-FIX2 preregistered degradation gate.",
-    "B0-FIX1 shows that specialized known-equation classical solvers dominate IPM-v1 on the current simple Advection/Burgers quality-speed frontier; this is an explicit paper limitation/boundary."
+    "B0-FIX1 shows that specialized known-equation classical solvers dominate IPM-v1 on the current simple Advection/Burgers quality-speed frontier; this is an explicit paper limitation/boundary.",
+    "PDEBench PB0 frozen historical-low-data entry has substantially larger Advection seed variability under the official reduced-time contract; current official pretrained baseline direct evaluation is required before comparative paper claims."
   ],
-  "no_parent_zip_required": true
+  "no_parent_zip_required": true,
+  "runtime_version": "1.0.1",
+  "runtime_compatibility_patch": "Complex spectral exponential is evaluated as real decay times cosine/sine phase to avoid environment-specific NVRTC complex-exp dependency. Frozen programs/coefficients are unchanged."
 }
