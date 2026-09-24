@@ -57,8 +57,26 @@ class IPMStep(nn.Module):
                 gamma=torch.zeros(x.shape[0],1,1,device=x.device,dtype=x.dtype)
             U=torch.fft.rfft(x,dim=-1)
             k=self.k.to(x.dtype)
-            symbol=-nu*k[None,None,:].square()+gamma*((1j*k).to(U.dtype)**3)[None,None,:]
-            x=torch.fft.irfft(U*torch.exp(self.dt*symbol),n=self.n,dim=-1).real
+
+            # Mathematically identical to
+            #   exp(dt * (-nu*k^2 + gamma*(i*k)^3))
+            # but avoids torch.exp(complex), whose CUDA Jiterator path can
+            # require an NVRTC-builtins soname that is absent/mismatched in
+            # some Colab images. Since (i*k)^3 = -i*k^3,
+            #
+            #   exp(-dt*nu*k^2 - i*dt*gamma*k^3)
+            # = exp(-dt*nu*k^2) * [cos(phi) - i sin(phi)].
+            #
+            # This is a runtime-equivalent implementation patch only; it
+            # does not alter the frozen PDE program or learned coefficients.
+            kk=k[None,None,:]
+            decay=torch.exp(-self.dt*nu*kk.square())
+            phi=self.dt*gamma*kk.pow(3)
+            multiplier=torch.complex(
+                decay*torch.cos(phi),
+                -decay*torch.sin(phi),
+            ).to(U.dtype)
+            x=torch.fft.irfft(U*multiplier,n=self.n,dim=-1).real
         return self.reaction(x,0.5*self.dt)
 
 def build_step(task,n,length,dt,seed=202,device=None):
