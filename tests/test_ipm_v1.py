@@ -63,3 +63,67 @@ def test_standard_data_scale_and_dense_compile_cpu():
     program=compile_dense_program(model,task="synthetic",seed=11)
     assert program.mask=="RTDS"
     assert set(program.coefficients)=={"R","T","D","S"}
+
+
+def test_runtime_applies_principal_role_gains_cpu():
+    from ipm_v1.core import FrozenProgram
+
+    torch.manual_seed(19)
+    u=torch.randn(5,1,96)
+    coeffs={
+        "R":(0.03,-0.02,0.0,0.0),
+        "T":(-0.4,0.1,0.0,0.0),
+        "D":(0.02,0.0,0.0,0.0),
+        "S":(0.001,0.0,0.0,0.0),
+    }
+    gains={"R":0.25,"T":1.7,"D":2.2,"S":-0.6}
+    p_gain=FrozenProgram("synthetic",1,"RTDS",gains,coeffs)
+
+    # Folding a scalar role gain into every coefficient of that role is
+    # mathematically identical to applying the gain at runtime.
+    folded={
+        role:tuple(float(gains[role])*float(v) for v in coeffs[role])
+        for role in ("R","T","D","S")
+    }
+    p_fold=FrozenProgram(
+        "synthetic",1,"RTDS",
+        {"R":1.0,"T":1.0,"D":1.0,"S":1.0},
+        folded,
+    )
+
+    m_gain=IPMStep(p_gain,96,1.0,1e-3)
+    m_fold=IPMStep(p_fold,96,1.0,1e-3)
+    y_gain=m_gain(u)
+    y_fold=m_fold(u)
+
+    rel=((y_gain-y_fold).pow(2).mean().sqrt()/
+         y_fold.pow(2).mean().sqrt().clamp_min(1e-12))
+    assert float(rel)<2e-6
+
+
+def test_nonunit_gain_changes_runtime_cpu():
+    from ipm_v1.core import FrozenProgram
+
+    torch.manual_seed(23)
+    u=torch.randn(4,1,64)
+    coeffs={
+        "R":(0.0,0.0,0.0,0.0),
+        "T":(-0.5,0.0,0.0,0.0),
+        "D":(0.0,0.0,0.0,0.0),
+        "S":(0.0,0.0,0.0,0.0),
+    }
+    unit=FrozenProgram(
+        "synthetic",1,"T",
+        {"R":0.0,"T":1.0,"D":0.0,"S":0.0},
+        coeffs,
+    )
+    double=FrozenProgram(
+        "synthetic",1,"T",
+        {"R":0.0,"T":2.0,"D":0.0,"S":0.0},
+        coeffs,
+    )
+    y1=IPMStep(unit,64,1.0,1e-2)(u)
+    y2=IPMStep(double,64,1.0,1e-2)(u)
+    rel=((y1-y2).pow(2).mean().sqrt()/
+         y1.pow(2).mean().sqrt().clamp_min(1e-12))
+    assert float(rel)>1e-4
