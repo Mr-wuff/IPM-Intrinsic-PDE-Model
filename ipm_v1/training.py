@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+import os
 import time
+from pathlib import Path
 from typing import Iterable
 
 import numpy as np
@@ -177,6 +179,9 @@ def fit_idtc_standard_data(
     strides: Iterable[int] = DEFAULT_STRIDES,
     scale_trajectories: int = 1024,
     diagnostic_every: int = 25,
+    checkpoint_path: str | Path | None = None,
+    checkpoint_every: int = 25,
+    resume: bool = True,
 ) -> StandardDataFit:
     """Fit the frozen 35-scalar IDTC under the PDEBench standard-data schedule.
 
@@ -227,12 +232,35 @@ def fit_idtc_standard_data(
     history: list[dict] = []
     updates = 0
     trajectory_exposures = 0
+    elapsed_before = 0.0
+    peak_before = 0.0
+    start_epoch = 1
+
+    checkpoint = Path(checkpoint_path) if checkpoint_path is not None else None
+    if checkpoint is not None and resume and checkpoint.exists():
+        payload = torch.load(checkpoint, map_location=train_data.device, weights_only=False)
+        if int(payload["seed"]) != int(seed) or str(payload["task"]) != str(task):
+            raise RuntimeError("Checkpoint task/seed does not match requested formal run.")
+        model.load_state_dict(payload["model_state_dict"], strict=True)
+        optimizer.load_state_dict(payload["optimizer_state_dict"])
+        scheduler.load_state_dict(payload["scheduler_state_dict"])
+        generator.set_state(payload["generator_state"])
+        history = list(payload.get("history", []))
+        updates = int(payload.get("optimizer_updates", 0))
+        trajectory_exposures = int(payload.get("trajectory_exposures", 0))
+        elapsed_before = float(payload.get("wall_seconds", 0.0))
+        peak_before = float(payload.get("peak_vram_mb", 0.0))
+        start_epoch = int(payload["epoch"]) + 1
+        print(
+            f"[IPM-SD resume] task={task} seed={seed} "
+            f"epoch={start_epoch-1}/{epochs} updates={updates}"
+        )
 
     torch.cuda.reset_peak_memory_stats()
     torch.cuda.synchronize()
     t0 = time.perf_counter()
 
-    for epoch in range(1, int(epochs) + 1):
+    for epoch in range(start_epoch, int(epochs) + 1):
         order = torch.randperm(ntraj, generator=generator, device=train_data.device)
         epoch_losses = []
 
@@ -290,9 +318,42 @@ def fit_idtc_standard_data(
                 f"updates={updates} loss={row['mean_loss']:.6g} lr={row['lr']:.3g}"
             )
 
+        if checkpoint is not None and (
+            epoch == int(epochs)
+            or (checkpoint_every and epoch % int(checkpoint_every) == 0)
+        ):
+            torch.cuda.synchronize()
+            current_wall = elapsed_before + (time.perf_counter() - t0)
+            current_peak = max(
+                peak_before,
+                torch.cuda.max_memory_allocated() / 2**20,
+            )
+            checkpoint.parent.mkdir(parents=True, exist_ok=True)
+            tmp = checkpoint.with_suffix(checkpoint.suffix + ".tmp")
+            torch.save(
+                {
+                    "task": str(task),
+                    "seed": int(seed),
+                    "epoch": int(epoch),
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "scheduler_state_dict": scheduler.state_dict(),
+                    "generator_state": generator.get_state(),
+                    "history": history,
+                    "optimizer_updates": int(updates),
+                    "trajectory_exposures": int(trajectory_exposures),
+                    "wall_seconds": float(current_wall),
+                    "peak_vram_mb": float(current_peak),
+                    "a_scale": tuple(float(x) for x in a_scale.detach().cpu().tolist()),
+                    "q_scale": float(q_scale),
+                },
+                tmp,
+            )
+            os.replace(tmp, checkpoint)
+
     torch.cuda.synchronize()
-    wall = time.perf_counter() - t0
-    peak = torch.cuda.max_memory_allocated() / 2**20
+    wall = elapsed_before + (time.perf_counter() - t0)
+    peak = max(peak_before, torch.cuda.max_memory_allocated() / 2**20)
 
     return StandardDataFit(
         model=model.eval(),
