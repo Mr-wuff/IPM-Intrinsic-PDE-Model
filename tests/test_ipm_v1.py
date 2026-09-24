@@ -45,3 +45,21 @@ def test_spectral_multiplier_runtime_equivalence_cpu():
     rel=((old-new).abs().pow(2).mean().sqrt()/
          old.abs().pow(2).mean().sqrt().clamp_min(1e-30))
     assert float(rel)<1e-12
+
+
+def test_standard_data_scale_and_dense_compile_cpu():
+    from ipm_v1.core import IDTC
+    from ipm_v1.training import estimate_standard_scales, compile_dense_program
+    torch.manual_seed(11)
+    data=torch.randn(16,64,17,dtype=torch.float32)
+    a_scale,q_scale=estimate_standard_scales(
+        data,length=1.0,dt=0.05,max_trajectories=8
+    )
+    assert a_scale.shape==(4,)
+    assert bool(torch.isfinite(a_scale).all())
+    assert q_scale>0
+
+    model=IDTC(a_scale=a_scale,q_scale=q_scale)
+    program=compile_dense_program(model,task="synthetic",seed=11)
+    assert program.mask=="RTDS"
+    assert set(program.coefficients)=={"R","T","D","S"}
