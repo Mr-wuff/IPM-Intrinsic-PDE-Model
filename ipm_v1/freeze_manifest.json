@@ -22,14 +22,17 @@
     "Q4": "e9073c703c72c2d44896bf437d6db02a1a00815c14771161de072fa5e83d729e",
     "B0_initial": "0894771ed6600029ef2771f81076f0046acd51a5ec37c9a7eb96fec8228d2566",
     "B0_FIX1": "dbeb2df1487718d51dd2f5180a440fa2f693b53f9c1e298281f3c0bb2c56918c",
-    "PDEBENCH_PB0": "4a2d77f9d954d9ff01a70f0b744f4df455a15efb7a9ba74febeca216c5a8b831"
+    "PDEBENCH_PB0": "4a2d77f9d954d9ff01a70f0b744f4df455a15efb7a9ba74febeca216c5a8b831",
+    "PDEBENCH_PB1_Q3": "7b2df05f462955e980324c10fb2342ae86b8973b66bff535eb4470c79e084c9f"
   },
   "known_limitations": [
     "Advection N/4 coarse-grid transfer remained above the Q3-FIX2 preregistered degradation gate.",
     "B0-FIX1 shows that specialized known-equation classical solvers dominate IPM-v1 on the current simple Advection/Burgers quality-speed frontier; this is an explicit paper limitation/boundary.",
-    "PDEBench PB0 frozen historical-low-data entry has substantially larger Advection seed variability under the official reduced-time contract; current official pretrained baseline direct evaluation is required before comparative paper claims."
+    "PDEBench PB0 frozen historical-low-data entry has substantially larger Advection seed variability under the official reduced-time contract; current official pretrained baseline direct evaluation is required before comparative paper claims.",
+    "PDEBench PB1-Q3 calibrated rollout gate is invalid because runtime v1.0.1 ignored non-unit FrozenProgram role gains; Q3-FIX1 must rerun corrected gain-aware flow evaluation before scientific calibration conclusions."
   ],
   "no_parent_zip_required": true,
-  "runtime_version": "1.0.1",
-  "runtime_compatibility_patch": "Complex spectral exponential is evaluated as real decay times cosine/sine phase to avoid environment-specific NVRTC complex-exp dependency. Frozen programs/coefficients are unchanged."
+  "runtime_version": "1.0.2",
+  "runtime_compatibility_patch": "Complex spectral exponential is evaluated as real decay times cosine/sine phase to avoid environment-specific NVRTC complex-exp dependency. Frozen programs/coefficients are unchanged.",
+  "runtime_gain_semantics_patch": "FrozenProgram principal role gains R/T/D/S are now explicitly applied by IPMStep. v1.0.0-v1.0.1 repository runtime stored gains but did not consume them. This is a runtime contract repair; learned program coefficients are unchanged."
 }
