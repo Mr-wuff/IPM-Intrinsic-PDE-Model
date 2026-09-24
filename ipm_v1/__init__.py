@@ -6,4 +6,4 @@ from .core import (
 )
 from .runtime import IPMStep, StepCUDAGraph, HorizonCUDAGraph, build_step
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
