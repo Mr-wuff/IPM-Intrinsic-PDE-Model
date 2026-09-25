@@ -132,7 +132,9 @@ DIC-DCC35 `a2` coefficients:
 - 0.007002
 - 0.007071
 
-Diffusion remains attenuated relative to the Taylor-coordinate reporting-only value 0.02 for nu=0.01, but the joint differential-integral contract materially improves both characteristic and long-horizon behavior.
+**Post-audit correction:** PDEBench's Burgers generator uses diffusion `epsilon/pi`. In Taylor coordinates `a2=u_xx/2`, the reporting-only true coefficient is therefore `2*epsilon/pi`. For `epsilon=0.01`, this is approximately **0.006366**. The learned diffusion coefficient is therefore close to the true PDE coefficient, with a modest positive bias, rather than the strong attenuation previously stated.
+
+This correction affects only the reporting-only physics audit; it does not alter the Q7-FIX1 identification, gates, rollout metrics, or architecture decision.
 
 ## Scientific conclusion
 
