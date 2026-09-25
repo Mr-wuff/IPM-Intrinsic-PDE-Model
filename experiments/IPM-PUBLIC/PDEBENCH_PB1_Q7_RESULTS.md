@@ -99,7 +99,11 @@ Across folds, DCC35 reporting-only coefficients are approximately:
 - `u*a1`: **-0.998 to -1.000**
 - `a2`: **0.00618 to 0.00629**
 
-The nonlinear transport coefficient is essentially recovered. Diffusion remains attenuated relative to the reporting-only Taylor-coordinate value `0.02`.
+The nonlinear transport coefficient is essentially recovered.
+
+**Post-audit correction:** PDEBench's Burgers generator uses diffusion `epsilon/pi`, not `epsilon`. Because the Taylor coordinate is `a2=u_xx/2`, the reporting-only true coefficient is `2*epsilon/pi`. For `epsilon=0.01`, that is approximately **0.006366**, so the learned `a2` coefficient is close to the true PDE coefficient rather than strongly attenuated.
+
+This correction affects only the post-hoc physical interpretation; it does not alter any Q7 fit, gate, metric, or decision.
 
 ### 5. The basis mismatch must be removed
 
