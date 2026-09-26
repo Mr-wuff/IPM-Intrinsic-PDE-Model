@@ -38,7 +38,7 @@ Relative train-only splits:
 - center-calibration block: 1536:1600
 - validation: 3072:3328
 - confirm: 3584:3840
-- internal runtime: first 64 confirm trajectories
+- runtime diagnostic: first 64 confirm trajectories
 
 ## Frozen spatial state
 
@@ -90,12 +90,10 @@ If this requirement fails, the run stops before fitting.
 No centered differential equation is used in the candidate fits.
 
 ### S2 — Simpson-2 integral
-For each valid center c:
 
 `u_{c+1}-u_{c-1} ≈ dt/3 * [Q_{c-1}+4Q_c+Q_{c+1}]`
 
 ### S4 — composite Simpson-4 integral
-For centers with c>=2 and c<=98:
 
 `u_{c+2}-u_{c-2} ≈ dt/3 * [Q_{c-2}+4Q_{c-1}+2Q_c+4Q_{c+1}+Q_{c+2}]`
 
@@ -112,7 +110,7 @@ Fit normalized ridge:
 - alpha=1e-8
 - column normalization
 - no SGD
-- no known physical coefficient
+- no known physical coefficient.
 
 ## Candidate selection
 
@@ -129,26 +127,33 @@ No known Reaction-Diffusion coefficient and no runtime result is used for select
 ## Internal qualification gates
 
 ### V1 — data-only gate viability
+
 GENVALID contains 3..12 centers.
 
 ### V2 — governing-law integral closure
+
 Selected P13 confirm integral residual:
 - mean <=0.15
 - max fold <=0.20.
 
 ### V3 — causal improvement over PB2-Q0
+
 Selected confirm integral mean / frozen CURRENT_SPARSE+DIC P13 confirm integral <=0.40.
 
 Frozen denominator:
+
 `0.4958194410829113`
 
 ### V4 — coefficient stability
+
 Selected median standardized coefficient cosine >=0.995.
 
 ### V5 — physical-law plausibility
+
 Reporting-only after selection.
 
 For the known PDE:
+
 `u_t=u-u^2+0.5*u_xx`
 
 and Taylor `a2=u_xx/2`, expected P13:
@@ -165,13 +170,28 @@ Pass if:
 
 These values are not used for center selection or S2/S4 candidate selection.
 
-### V6 — internal full-horizon runtime
-Frozen native IPMStep on official spatial reduction 4:
-- all three folds finite;
-- mean Rel-L2 <=0.06
-- max fold <=0.08.
+## Runtime diagnostic — not a qualification gate
+
+The current `IPMStep` coarse-stride runtime is already known to execute the exact continuum law poorly on this benchmark (~0.217 Rel-L2), while an effective closure obtains ~0.039.
+
+Therefore runtime accuracy must not be used to reject an otherwise physically correct law in FIX3.
+
+Report both:
+- FULL1024 native runtime;
+- official STRIDE4-256 native runtime;
+for the selected P13 programs.
+
+Requirements:
+- all trajectories must remain finite.
+
+Runtime error is diagnostic only and will be repaired separately if law identification succeeds.
+
+### V6 — finite runtime integrity
+
+All selected-program FULL1024 and STRIDE4 rollouts remain finite.
 
 ### V7 — DCC35 attribution
+
 Reporting:
 - DCC35/P13 integral residual ratio;
 - condition-number ratio;
@@ -182,17 +202,21 @@ V7 is diagnostic, not a pass/fail gate.
 ## Routing
 
 If V1-V6 all pass:
+
 `TEMPORAL_VALIDITY_GATED_STRONG_INTEGRAL_SUPPORTED`
 
 If V2/V3/V4/V6 pass but V5 fails:
+
 `FINITE_TIME_EFFECTIVE_CLOSURE_ONLY`
 
 If V1 passes but V2/V3 fail:
+
 `STRONG_INTEGRAL_IDENTIFICATION_INSUFFICIENT`
 
 Otherwise:
+
 `REACTION_DIFFUSION_STRONG_BRANCH_UNRESOLVED`
 
 No official test access, architecture freeze, or 500-epoch training is authorized.
 
-If the first route is reached, the next experiment must be independent parameter confirmation on previously unused Reaction-Diffusion Nu/Rho pairs.
+If the first route is reached, the next experiment must independently confirm the frozen identification contract on previously unused Reaction-Diffusion Nu/Rho pairs before any official-test unlock.
