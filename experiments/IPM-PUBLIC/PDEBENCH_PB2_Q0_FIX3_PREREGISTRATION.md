@@ -16,7 +16,7 @@ In contrast, centers roughly 2..7 retain meaningful signal with much lower tempo
 
 FIX3 tests a stricter concept:
 
-**generator-valid observation = enough dynamical signal + sufficiently low finite-time curvature.**
+**generator-valid observation = enough dynamical signal + sufficiently low finite-time curvature. The 15% signal floor deliberately excludes the long low-signal relaxation tail instead of allowing near-equilibrium samples to dominate the algebra.**
 
 No known PDE coefficient is used to select time centers or model candidates.
 
@@ -73,7 +73,7 @@ Let `s_max=max_c s_c`.
 
 A center is generator-valid iff:
 
-- `s_c >= 0.05*s_max`
+- `s_c >= 0.15*s_max`
 - `r_c <= 0.40`
 
 All qualifying centers form the frozen set `GENVALID`.
